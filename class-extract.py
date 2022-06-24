@@ -15,26 +15,21 @@ class MyHTMLParser(HTMLParser):
 	def __init__(self):
 		HTMLParser.__init__(self)
 		self.location_flag = False
-	#	self.title_flag = False
-	#	self.time_flag = False
+
  
 	#处理开始标签，这里的attrs获取到的是属性列表，属性以元组方式表示
 	#获取class,选取需要的标签
 	def handle_starttag(self, tag, attrs):
-      #  if tag == 'span' and _attr(attrs, 'class') == 'interfaceName':
-		#	self.location_flag = True
+     #if tag == 'a' and re.match(r'target="classFrame"', _attr(attrs, 'href')):
+	#		self.location_flag = True
 		if tag == 'span' and _attr(attrs, 'class') == 'interfaceName':
 			self.location_flag = True
-    # if tag == 'a' and re.match(r'^/events/python-events/(\w{3})/$', _attr(attrs, 'href')):
-	#		self.title_flag = True
-	#	elif tag == 'span' and _attr(attrs, 'class') == 'event-location':
+	#	if tag == 'a' and re.match(r'[java/ org/ javax/]', _attr(attrs, 'href')):
 	#		self.location_flag = True
-	#	elif tag == 'time':
-	#		self.time_flag = True
+    
 		else:
 			self.location_flag = False
-		#	self.title_flag = False
-		#	self.time_flag = False
+	
  
 	#处理结束标签，比如</div>
 	def handle_endtag(self, tag):
