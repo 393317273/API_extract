@@ -5,10 +5,10 @@ import interface_link
 import class_link
 
 
-def merge(name1, name2,name3,name4,name5,name6):
-    dict1 = {"Package":name1,"Interface":name2,"Superinterface":name3,
-                "Implementing Class":name4,"Subinterface":name5,"Method":name6}
-    with open('C:/Users/LGH/Desktop/API_extract.txt', 'a+') as f:
+def merge(package, interface, super_Interface, imple_Class, sub_Interface, method):
+    dict1 = {"Package":package,"Interface":interface,"Superinterface":super_Interface,
+                "Implementing Class":imple_Class,"Subinterface":sub_Interface,"Method":method}
+    with open('extract_result.txt', 'w') as f:
             print(dict1,"\n", file=f)
 
 def main():
@@ -25,14 +25,14 @@ def main():
               package_content = re.findall('<div class="header">(.*?)<div class="contentContainer">',interface_html,re.S)
               p = re.compile(r'<div class="subTitle">(.*?)</div>')
               for m2 in p.findall(str(package_content)): 
-                     111
+                     pass
                      #print("Package:")
                      #print(m2)
 
 
               p = re.compile(r'<h2 title="Interface(.*)" class="title">', re.MULTILINE)
               for m3 in p.findall(interface_html):
-                     111
+                     pass
                      #print("Interface:")
                      #print(m3)
 
