@@ -1,17 +1,21 @@
 import re
+from unittest import result
 from urllib import response
 import urllib.request
 import interface_link
 import class_link
+import json
 
 
 def merge(package, interface, super_Interface, imple_Class, sub_Interface, method):
-    dict1 = {"Package":package,"Interface":interface,"Superinterface":super_Interface,
-                "Implementing Class":imple_Class,"Subinterface":sub_Interface,"Method":method}
-    with open('extract_result.txt', 'w') as f:
-            print(dict1,"\n", file=f)
+       dict1 = {"Package":package,"Interface":interface,"Superinterface":super_Interface,
+                     "Implementing Class":imple_Class,"Subinterface":sub_Interface,"Method":method}
+       #result = json.dumps(dict1)
+       return dict1
 
 def main():
+       json_num = 0
+       result_dict = {}
        for m1 in range(len(interface_link.all_interface_link)):
               url = interface_link.all_interface_link[m1]
               with open(url,'r',encoding='utf-8') as f:
@@ -24,19 +28,13 @@ def main():
               #print("{")
               package_content = re.findall('<div class="header">(.*?)<div class="contentContainer">',interface_html,re.S)
               p = re.compile(r'<div class="subTitle">(.*?)</div>')
-              for m2 in p.findall(str(package_content)): 
-                     pass
-                     #print("Package:")
-                     #print(m2)
-
-
+              m2 = p.findall(str(package_content))
+              if m2 == []:continue
+              m2 = m2[0]
               p = re.compile(r'<h2 title="Interface(.*)" class="title">', re.MULTILINE)
-              for m3 in p.findall(interface_html):
-                     pass
-                     #print("Interface:")
-                     #print(m3)
-
-              
+              m3 = p.findall(interface_html)
+              if m3 == []:continue
+              m3 = m3[0]
               #------------------Superinterfaces:---------------------------------
               content_interface = re.findall('<dt>All Superinterfaces:</dt>(.*?)</dl>',interface_html,re.S)
               imple_interface1 = list()
@@ -125,9 +123,15 @@ def main():
                      
                      dict_method = dict()
                      dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
-              merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
-
-
+              try:
+                     result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
+                     json_num+=1
+              except:
+                     continue
+       with open("extract_result.json","w") as f:
+              json.dump(result_dict,f)
+if __name__ == "__main__":
+       main()
    
 
     
