@@ -1,6 +1,7 @@
 import re
 from urllib import response
 import urllib.request
+#import load_html
 
 
 url = "file:///C:/docs/api/overview-frame.html"
@@ -36,19 +37,14 @@ for i in link:
 
 #url = 'file:///C:/docs/api/java/applet/package-frame.html'
 
-'''def printpackage():
-    packagelist = list()
-    p = re.compile(r'target="packageFrame">(.*)</a>', re.MULTILINE)
-    for i in p.findall(html_first):
-        packagelist.append(i)
-    for j in range(len(packagelist)):
-        print(packagelist[j])
-printpackage()'''
+
 
 packagelist = list()
 p = re.compile(r'target="packageFrame">(.*)</a>', re.MULTILINE)
 for i in p.findall(html_first):
         packagelist.append(i)
+
+
 
 
 for i in range(len(linkpath)):
@@ -108,7 +104,7 @@ for i in range(len(linkpath)):
 
 
     print("\n")
-
+   
 
 
 
