@@ -1,6 +1,7 @@
 from urllib import response
 import os
 docPath = "..//docs//api"
+docPath = os.path.abspath(docPath)#增加代码可复用性
 all_interface_link = []
 for root, dirs, files in os.walk(docPath):
     for name in files:

@@ -6,12 +6,15 @@ import interface_link
 def main():
        for m1 in range(len(interface_link.all_interface_link)):
               url = interface_link.all_interface_link[m1]
-              response = urllib.request.urlopen(url)
-              interface_html = response.read()
-              interface_html = interface_html.decode("utf-8")
+              #response = urllib.request.urlopen(url)
+              #interface_html = response.read()
+              with open(url,'r',encoding='utf-8') as f:
+                     content = f.read()
+              #interface_html = content.decode("utf-8")
+              interface_html = str(content)
               #print(interface_html)
 
-              
+              # TODO: 改re为htmlparser
               print("{")
               package_content = re.findall('<div class="header">(.*?)<div class="contentContainer">',interface_html,re.S)
               p = re.compile(r'<div class="subTitle">(.*?)</div>')
