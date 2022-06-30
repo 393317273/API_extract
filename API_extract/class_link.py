@@ -1,4 +1,14 @@
-import re
+from urllib import response
+import os
+docPath = "C://docs//api"      #"..//docs//api"       
+docPath = os.path.abspath(docPath)#增加代码可复用性
+all_class_link = []
+for root, dirs, files in os.walk(docPath):
+    for name in files:
+        if root == docPath or name[-4:]!="html" :continue
+        all_class_link.append(os.path.join(root, name).replace("\\","//"))
+
+'''import re
 from urllib import response
 import urllib.request
 
@@ -223,4 +233,4 @@ all_class_link = ['file:///C:/docs/api/java/applet/Applet.html',
 
 
 #print(class_link[100])
-#print(len(class_link))
+#print(len(class_link))'''

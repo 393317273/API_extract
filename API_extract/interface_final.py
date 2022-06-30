@@ -30,7 +30,7 @@ def main():
               p = re.compile(r'<div class="subTitle">(.*?)</div>')
               m2 = p.findall(str(package_content))
               if m2 == []:continue
-              m2 = m2[0]
+              m2 = m2[-1]
               p = re.compile(r'<h2 title="Interface(.*)" class="title">', re.MULTILINE)
               m3 = p.findall(interface_html)
               if m3 == []:continue
@@ -104,6 +104,7 @@ def main():
               p = re.compile('<li class="blockList">(.*?)</li>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
+              dict_method = dict()
               for x1 in range(len(menthon_list1)):
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
@@ -115,14 +116,17 @@ def main():
                      Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
                      #print(Parameter)
                      
-
                      #print("Throw:")
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
                      throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
                      #print(throw)
                      
-                     dict_method = dict()
-                     dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
+                     #dict_method = dict()
+                     #dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
+                     dict_method1 = dict()
+                     dict_method1 = {"method":methon,"Parameter":Parameter,"Throw":throw}
+              dict_method.update(dict_method1)
+              
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
                      json_num+=1
