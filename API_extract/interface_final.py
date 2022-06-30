@@ -123,9 +123,9 @@ def main():
                      
                      #dict_method = dict()
                      #dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
-                     dict_method1 = dict()
-                     dict_method1 = {"method":methon,"Parameter":Parameter,"Throw":throw}
-              dict_method.update(dict_method1)
+                     #dict_method1 = dict()
+                     dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+              #dict_method.update(dict_method1)
               
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
