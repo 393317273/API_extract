@@ -104,6 +104,7 @@ def main():
               p = re.compile('<li class="blockList">(.*?)</li>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
+              dict_method = dict()
               for x1 in range(len(menthon_list1)):
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
@@ -121,8 +122,9 @@ def main():
                      throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
                      #print(throw)
                      
-                     dict_method = dict()
-                     dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
+                     
+                     dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
+                     
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
                      json_num+=1
