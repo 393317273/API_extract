@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {
     "0": {
         "Package": "java.applet",
@@ -23948,3 +23949,6 @@
         }
     }
 }
+=======
+{}
+>>>>>>> Stashed changes
