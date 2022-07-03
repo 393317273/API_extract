@@ -5,11 +5,28 @@ import urllib.request
 import interface_link
 import class_link
 import json
-
-
+#TODO: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
+# interface是str，method给到是元组，subinterface一般是list
+def removeSpace(inputStrList):
+       inputIsStr = False
+       if len(inputStrList)==0: return
+       if str(type(inputStrList))=="<class 'str'>":
+              inputStrList = [inputStrList]
+              inputIsStr = True
+       if str(type(inputStrList[0])) == "<class 'tuple'>":
+              inputStrList = inputStrList[0]
+       resultStr = []
+       for inputStr in inputStrList:
+              if inputStr[0]==" ":
+                     resultStr.append(inputStr[1:])
+              else:
+                     resultStr.append(inputStr)
+       if inputIsStr:
+              return resultStr[0]
+       return resultStr
 def merge(package, interface, super_Interface, imple_Class, sub_Interface, method):
-       dict1 = {"Package":package,"Interface":interface,"Superinterface":super_Interface,
-                     "Implementing Class":imple_Class,"Subinterface":sub_Interface,"Method":method}
+       dict1 = {"Package":package,"Interface":removeSpace(interface),"Superinterface":removeSpace(super_Interface),
+                     "Implementing Class":removeSpace(imple_Class),"Subinterface":removeSpace(sub_Interface),"Method":method}
        #result = json.dumps(dict1)
        return dict1
 
@@ -121,12 +138,9 @@ def main():
                      throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
                      #print(throw)
                      
-                     #dict_method = dict()
-                     #dict_method = {"method":methon,"Parameter":Parameter,"Throw":throw}
-                     #dict_method1 = dict()
-                     dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
-              #dict_method.update(dict_method1)
-              
+                     
+                     dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
+                     
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
                      json_num+=1
