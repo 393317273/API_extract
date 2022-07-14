@@ -136,7 +136,12 @@ def main():
                      
                      #print("Throw:")
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
-                     throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
+                     if re.search(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content)):
+                            throwtext = re.search(r'<dd><code><a href=".+title="class in (.*?)"></a></code>',str(throw_content))
+                            throw = throwtext.group(1)+'.'+throwtext.group(2)
+                     else:
+                            throw = []
+                     
                      #print(throw)
                      
                      

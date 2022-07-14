@@ -33,8 +33,6 @@ def merge(package, interface, super_Interface, imple_Class, sub_Interface, metho
 def main():
        json_num = 0
        result_dict = {}
-       print(interface_link17.all_interface_link[9999])
-       #print(len(interface_link17.all_interface_link))
        for m1 in range(len(interface_link17.all_interface_link)):
               url = interface_link17.all_interface_link[m1]
               with open(url,'r',encoding='utf-8') as f:
@@ -45,15 +43,18 @@ def main():
               #print(interface_html)
               
               #print("{")
-              package_content = re.findall('<div class="header">(.*?)<div class="contentContainer">',interface_html,re.S)
-              p = re.compile(r'<div class="subTitle"><span class="packageLabelInType">.*?tml">(.*?)</a></div>')
+              package_content = re.findall('<div class="header">(.*?)<!-- ========== METHOD SUMMARY =========== -->',interface_html,re.S)
+              #print(package_content)
+              p = re.compile(r'<div class="sub-title"><span class="package-label-in-type">.*?tml">(.*?)</a></div>')
               m2 = p.findall(str(package_content))
               if m2 == []:continue
               m2 = m2[-1]
-              p = re.compile(r'<h2 title="Interface (.*)" class="title">', re.MULTILINE)
+              #print(m2)
+              p = re.compile(r'<h1 title="Interface (.*)" class="title">', re.MULTILINE)
               m3 = p.findall(interface_html)
               if m3 == []:continue
               m3 = m3[0]
+              #print(m3)
               #------------------Superinterfaces:---------------------------------
               content_interface = re.findall('<dt>All Superinterfaces:</dt>(.*?)</dl>',interface_html,re.S)
               imple_interface1 = list()
@@ -117,31 +118,36 @@ def main():
 
 
               #------------------Method Detail:---------------------------------
-              content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
+              content_methon = re.findall('<!-- ============ METHOD DETAIL ========== -->(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
               content = str(content_methon)
               menthon_list1 = list()
-              p = re.compile('<li class="blockList">(.*?)</li>',re.S)
+              p = re.compile('<section class="detail"(.*?)</section>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
               dict_method = dict()
               for x1 in range(len(menthon_list1)):
                      #print("Methon:")
-                     methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
+                     methon = re.findall(r'<h3>(.*?)</h3>',menthon_list1[x1])
                      #print(methon)
 
-                     #print("Parameter:")
-                     Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
+                     
+                     #Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
                      #print(Parameter_content1)
-                     Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre>',str(Parameter_content1))
+                     #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre>',str(Parameter_content1))
+                     
+                     Parameter = re.findall(r'<section class="detail" id.*?[(](.*?)[)]">',menthon_list1[x1])
                      #print(Parameter)
                      
-                     #print("Throw:")
-                     throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
-                     throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
+                    
+                     #throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
+                     throw = re.findall(r'<span class="exceptions"><a href="(.*?)/.html',menthon_list1[x1])
+                     #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
                      #print(throw)
                      
-                     
-                     dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
+                     if methon:                 
+                            dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+                     else:
+                            dict_method={} 
                      
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)

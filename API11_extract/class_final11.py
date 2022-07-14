@@ -142,11 +142,15 @@ def main():
                      if len(type1)==0:
                             type=[]
                      else:
-                            type = ''.join(type1)+'.'+''.join(type2)                 
+                            type = ''.join(type1)+'.'+''.join(type2)
+                     if field_name:                 
+                            dict_field[str(field_name[0])] = {"Modifier":Modifier,"Type":type}
+                     else:
+                            dict_field={}                        
                      #type = re.findall(r'st"><code>(.*?) <a href.*" title="class in (.*?)">(.*?)</a></code></td>',str(field_list1[x1]))
               #print(type)                
               #dict_field1 = dict()
-              dict_field = {"Modifier":Modifier,"Field_name":field_name,"Type":type}
+              #dict_field = {"Modifier":Modifier,"Field_name":field_name,"Type":type}
               #dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
                      #dict_field[str(field_name[0])] = {"Type":type}
               #print(dict_field)
@@ -161,28 +165,36 @@ def main():
                      menthon_list1.append(j)
               dict_method = dict()
               for x1 in range(len(menthon_list1)):
-                     #print("Methon:")
+                    
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     #print(methon)
-                     #print("Parameter:")
+                    
                      Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
-                     #print(Parameter_content1)
-                     #Parameter = re.findall(r'title="class in (.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
-                     Parameter = re.findall(r'title="class in (.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre',str(Parameter_content1))
-                     #print(Parameter)
-                     #print("Throw:")
+                     Parameter = dict()
+                     #Parameter = re.findall(r'title="class in (.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre',str(Parameter_content1))
+                     Parameter_type1 = re.findall(r'title="class in (.*?)">.*?</a>&nbsp;.*?[)]</pre',str(Parameter_content1))
+                     Parameter_type2 = re.findall(r'title="class in .*?">(.*?)</a>&nbsp;.*?[)]</pre',str(Parameter_content1))
+                     Parameter_name = re.findall(r'title="class in .*?">.*?</a>&nbsp;(.*?)[)]</pre',str(Parameter_content1))
+                     for x2 in range(len(Parameter_type1)):
+                         if Parameter_type1[x2]:
+                            Parameter_type = ''.join(Parameter_type1[x2])+'.'+''.join(Parameter_type2[x2])
+                         else:
+                            Parameter_type=Parameter_type2   
+                         Parameter = {"Parameter_name":Parameter_name[x2],"Parameter_type":Parameter_type[x2]}                      
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
-                     throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
-                     #print(throw)
-                     #dict_method1 = {"method":methon,"Parameter":Parameter,"Throw":throw}
+                     #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
+                     if re.search(r'<dd><code><a href=".+ title="class in (.*?)">(.*?)</a></code>',str(throw_content)):
+                            throwtext = re.search(r'<dd><code><a href=".+ title="class in (.*?)">(.*?)</a></code>',str(throw_content))
+                            throw = throwtext.group(1)+'.'+throwtext.group(2)
+                     else:
+                            throw = []
                      dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
-                     merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,dict_method) 
+                     #merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,dict_method) 
               try:
                      result_dict[json_num] = merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,dict_method)
                      json_num+=1
               except:
                      continue
-       with open("class_result11.json","w") as f:
+       with open(f"class_result//class_result11.json","w") as f:
               json.dump(result_dict,f)       
               
               #print("}")

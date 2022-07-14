@@ -33,7 +33,7 @@ def merge(package, interface, super_Interface, imple_Class, sub_Interface, metho
 def main():
        json_num = 0
        result_dict = {}
-       print(interface_link9.all_interface_link[1])
+       #print(interface_link9.all_interface_link[1])
        for m1 in range(len(interface_link9.all_interface_link)):
               url = interface_link9.all_interface_link[m1]
               with open(url,'r',encoding='utf-8') as f:
@@ -133,11 +133,15 @@ def main():
                      #print(Parameter_content1)
                      Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
                      #print(Parameter)
-                     
+                      
                      #print("Throw:")
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
-                     throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
-                     #print(throw)
+                     #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
+                     if re.search(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content)):
+                            throwtext = re.search(r'<dd><code><a href=".+title="class in (.*?)">(.*?)</a></code>',str(throw_content))
+                            throw = throwtext.group(1)+'.'+throwtext.group(2)
+                     else:
+                            throw = []
                      
                      
                      dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}

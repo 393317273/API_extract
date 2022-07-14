@@ -21,6 +21,7 @@ def main():
        result_dict = {}
        for m1 in range(len(class_link8.all_class_link)):
               url = class_link8.all_class_link[m1]
+              
               with open(url,'r',encoding='utf-8') as f:
                      try:
                             class_html = f.read()
@@ -122,7 +123,7 @@ def main():
 
 
 
-              #------------------Field Detail:---------------------------------
+              #------------------Field Summary:---------------------------------
               content_filed =re.findall('<h3>Field Summary</h3>(.*?)</table>',class_html,re.S) 
               content1 = str(content_filed)
               field_list1 = list()
@@ -132,20 +133,18 @@ def main():
               dict_field = dict()
               for x1 in range(len(field_list1)):
                      field_name = re.findall(r'<td class="colLast"><code><span class="memberNameLink"><a href=".*">(.*?)</a></span></code>',field_list1[x1])
-                     #print(field_name[0])
+                     #print(field_name)
                      Modifier = re.findall(r'st"><code>(.*?) <a href',str(field_list1[x1]))
                      type1 = re.findall(r'<a href.*" title="class in (.*?)">',str(field_list1[x1]))
                      type2 = re.findall(r'st"><code>.* <a href.*" title="class in .*">(.*?)</a></code></td>',str(field_list1[x1]))
                      if len(type1)==0:
-                            type=[]
+                            type=type2
                      else:
-                            type = ''.join(type1)+'.'+''.join(type2)                 
-                     #type = re.findall(r'st"><code>(.*?) <a href.*" title="class in (.*?)">(.*?)</a></code></td>',str(field_list1[x1]))
-              #print(type)                
-              #dict_field1 = dict()
-              dict_field = {"Modifier":Modifier,"Type":type,"Field_name":field_name}
-              #dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
-                     #dict_field[str(field_name[0])] = {"Type":type}
+                            type = ''.join(type1)+'.'+''.join(type2)
+                     if field_name:                 
+                            dict_field[str(field_name[0])] = {"Modifier":Modifier,"Type":type}
+                     else:
+                            dict_field={}
               #print(dict_field1)
 
 
@@ -158,18 +157,32 @@ def main():
                      menthon_list1.append(j)
               dict_method = dict()
               for x1 in range(len(menthon_list1)):
-                     #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     #print(methon)
-                     #print("Parameter:")
                      Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
-                     #print(Parameter_content1)
-                     Parameter = re.findall(r'title="class in (.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
-                     #print(Parameter)
-                     #print("Throw:")
+                     #Parameter_content1 = re.findall(r'<pre>(.*?)[)]',menthon_list1[x1])
+                     #Parameterall = re.findall(r'title="class in (.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
+                     Parameter = dict()
+                     Parameter_type1 = re.findall(r'title="class in (.*?)">.*?</a>&nbsp;.*?,''',str(Parameter_content1))
+                     Parameter_type2 = re.findall(r'title="class in .*?">(.*?)</a>&nbsp;.*?,''',str(Parameter_content1))
+                     Parameter_name = re.findall(r'title="class in .*?">.*?</a>&nbsp;(.*?),''',str(Parameter_content1))
+                     '''if Parameter_type1:
+                            Parameter_type = ''.join(Parameter_type1)+'.'+''.join(Parameter_type2)
+                     else:
+                            Parameter_type=Parameter_type2'''
+                     for x2 in range(len(Parameter_type1)):
+                         if Parameter_type1[x2]:
+                            Parameter_type = ''.join(Parameter_type1[x2])+'.'+''.join(Parameter_type2[x2])
+                         else:
+                            Parameter_type=Parameter_type2   
+                         Parameter = {"Parameter_name":Parameter_name[x2],"Parameter_type":Parameter_type[x2]}
+                     
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
-                     throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
-                     #print(throw)
+                     if re.search(r'<dd><code><a href=".+ title="class in (.*?)">(.*?)</a></code>',str(throw_content)):
+                            throwtext = re.search(r'<dd><code><a href=".+ title="class in (.*?)">(.*?)</a></code>',str(throw_content))
+                            throw = throwtext.group(1)+'.'+throwtext.group(2)
+                     else:
+                            throw = []
+ 
                      #dict_method1 = {"method":methon,"Parameter":Parameter,"Throw":throw}
                      dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
               try:
@@ -177,12 +190,8 @@ def main():
                      json_num+=1
               except:
                      continue
-       with open("class_result8.json","w") as f:
+       with open(f"class_result//class_result8.json","w") as f:
               json.dump(result_dict,f)       
-              
-              #print("}")
-              #print("\n")
-              
 
        
 if __name__ == "__main__":
