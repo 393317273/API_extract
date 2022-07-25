@@ -1,8 +1,13 @@
+from heapq import merge
 import json
-def loadJson(path):
+def loadJson(path,version):
     with open(path,'r') as f:
         jsonDict = json.load(f)
+    jsonDict["version"] = version
     return jsonDict
+def writeJson(jsonDict,path):
+    with open(path,'w') as f:
+        json.dump(jsonDict,f)
 '''
 提取字典里的class全名
 '''
@@ -25,15 +30,59 @@ def extractInterface(jsonDict):
 def getJsonPath(jsonVer):
     return f"interface_result{jsonVer}.json"
 
-#TODO:两个功能
+#TODO:两个功能 注意为了可读性，把全称作为键名返回吧
 '''
-输入JDK字典，拼接并返回所有接口的全名，返回两个字典：一个存了全名的，一个只有Interface的
+输入JDK字典，拼接并返回所有接口的全名，返回以全称作为建名的字典
 '''
 def extractFullInterface(jsonDict):
-    pass
-#TODO：能不能用set来解决字典取并集的问题？感觉要用递归的办法 先实现了interface跟method的比对再说
+    newJDKDict = {}
+    for __classId in jsonDict:
+        if __classId == "version":
+            continue
+        newJDKDict[f"{jsonDict[__classId]['Package']}.{jsonDict[__classId]['Interface']}"] = jsonDict[__classId]
+    return newJDKDict
 '''
-输入JDK字典，返回只存了全名和method的
+输入两个method字典，整合并输出一个带有version键值对的字典
 '''
-def extractMethod(jsonDict):
-    pass
+def compareMethod(methodDictA,methodDictB,versionA,versionB):
+    mergedMethod = {}
+    A_method = methodDictA.keys()
+    B_method = methodDictB.keys()
+    for method in list(set(A_method)-set(B_method)):
+        mergedMethod[method] = methodDictA[method]
+        mergedMethod[method]["Exist_Version"] = versionA
+    for method in list(set(B_method)-set(A_method)):
+        mergedMethod[method] = methodDictB[method]
+        mergedMethod[method]["Exist_Version"] = versionB
+    for method in list(set(B_method) & set(A_method)):
+        mergedMethod[method] = methodDictA[method]
+        mergedMethod[method]["Exist_Version"] = f"{versionA},{versionB}"
+    return mergedMethod
+'''
+输入两个JDK字典，用桶排序遍历键名，查询只在18出现的，两者皆有的，只在19出现的，然后返回
+'''
+def compareJDK(JDKA,JDKB,A_version,B_version):
+    mergedJDK = {}
+    JDKA_interface = JDKA.keys()
+    JDKB_interface = JDKB.keys()
+    # 对比类
+    interfaceOnlyinB = set(JDKB_interface) - set(JDKA_interface)
+    interfaceOnlyinA = set(JDKA_interface) - set(JDKB_interface)
+    interfaceinBoth = set(JDKA_interface) & set(JDKB_interface)
+    # 对比方法 只对均出现的接口方法进行方法对比即可
+    for interface in list(interfaceOnlyinA):
+        mergedJDK[interface] = JDKA[interface]
+        mergedJDK[interface]["Exist_Version"] = A_version
+        for methodName in mergedJDK[interface]["Method"]:
+            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = A_version
+    for interface in list(interfaceOnlyinB):
+        mergedJDK[interface] = JDKB[interface]
+        mergedJDK[interface]["Exist_Version"] = B_version
+        for methodName in mergedJDK[interface]["Method"]:
+            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = B_version         
+    for interface in list(interfaceinBoth):
+        mergedJDK[interface] = JDKA[interface]
+        mergedJDK[interface]["Exist_Version"] = f"{A_version},{B_version}"
+        mergedMethod = compareMethod(JDKA[interface]["Method"],JDKB[interface]["Method"],A_version,B_version)
+        mergedJDK[interface]["Method"] = mergedMethod
+    return mergedJDK
