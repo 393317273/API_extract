@@ -50,10 +50,10 @@ def compareMethod(methodDictA,methodDictB,versionA,versionB):
     B_method = methodDictB.keys()
     for method in list(set(A_method)-set(B_method)):
         mergedMethod[method] = methodDictA[method]
-        mergedMethod[method]["Exist_Version"] = versionA
+        mergedMethod[method]["Exist_Version"] = [versionA]
     for method in list(set(B_method)-set(A_method)):
         mergedMethod[method] = methodDictB[method]
-        mergedMethod[method]["Exist_Version"] = versionB
+        mergedMethod[method]["Exist_Version"] = [versionB]
     for method in list(set(B_method) & set(A_method)):
         mergedMethod[method] = methodDictA[method]
         mergedMethod[method]["Exist_Version"] = [versionA,versionB]
@@ -72,14 +72,14 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
     # 对比方法 只对均出现的接口方法进行方法对比即可
     for interface in list(interfaceOnlyinA):
         mergedJDK[interface] = JDKA[interface]
-        mergedJDK[interface]["Exist_Version"] = A_version
+        mergedJDK[interface]["Exist_Version"] = [A_version]
         for methodName in mergedJDK[interface]["Method"]:
-            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = A_version
+            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [A_version]
     for interface in list(interfaceOnlyinB):
         mergedJDK[interface] = JDKB[interface]
-        mergedJDK[interface]["Exist_Version"] = B_version
+        mergedJDK[interface]["Exist_Version"] = [B_version]
         for methodName in mergedJDK[interface]["Method"]:
-            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = B_version         
+            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [B_version]         
     for interface in list(interfaceinBoth):
         mergedJDK[interface] = JDKA[interface]
         mergedJDK[interface]["Exist_Version"] = [A_version,B_version]
