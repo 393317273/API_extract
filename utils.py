@@ -56,7 +56,7 @@ def compareMethod(methodDictA,methodDictB,versionA,versionB):
         mergedMethod[method]["Exist_Version"] = versionB
     for method in list(set(B_method) & set(A_method)):
         mergedMethod[method] = methodDictA[method]
-        mergedMethod[method]["Exist_Version"] = f"{versionA},{versionB}"
+        mergedMethod[method]["Exist_Version"] = [versionA,versionB]
     return mergedMethod
 '''
 输入两个JDK字典，用桶排序遍历键名，查询只在18出现的，两者皆有的，只在19出现的，然后返回
@@ -82,7 +82,7 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
             mergedJDK[interface]["Method"][methodName]["Exist_Version"] = B_version         
     for interface in list(interfaceinBoth):
         mergedJDK[interface] = JDKA[interface]
-        mergedJDK[interface]["Exist_Version"] = f"{A_version},{B_version}"
+        mergedJDK[interface]["Exist_Version"] = [A_version,B_version]
         mergedMethod = compareMethod(JDKA[interface]["Method"],JDKB[interface]["Method"],A_version,B_version)
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK
