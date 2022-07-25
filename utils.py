@@ -24,3 +24,16 @@ def extractInterface(jsonDict):
 '''
 def getJsonPath(jsonVer):
     return f"interface_result{jsonVer}.json"
+
+#TODO:两个功能
+'''
+输入JDK字典，拼接并返回所有接口的全名，返回两个字典：一个存了全名的，一个只有Interface的
+'''
+def extractFullInterface(jsonDict):
+    pass
+#TODO：能不能用set来解决字典取并集的问题？感觉要用递归的办法 先实现了interface跟method的比对再说
+'''
+输入JDK字典，返回只存了全名和method的
+'''
+def extractMethod(jsonDict):
+    pass
