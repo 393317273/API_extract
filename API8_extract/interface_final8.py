@@ -113,7 +113,9 @@ def main():
                      imple_class3.append(k)
               #print(imple_class3)
 
-
+              #TODO:提取Method的Parameter
+              #TODO 从Method Detail提取 HTML符号是ul li l里的dd 名字在h4
+              #用Beautifulsoup读取HTML对象！
               #------------------Method Detail:---------------------------------
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
               content = str(content_methon)
