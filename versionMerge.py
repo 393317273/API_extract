@@ -5,7 +5,8 @@ merged_path = "interface_merged.json"
 #DONE: argv模块读取两个输入的版本号，然后读取这两个版本号的json文件
 from utils import *
 import sys
-#TODO：根据全称对比
+#DONE：根据全称对比
+#TODO：所有一起对比，递归方法
 def main():
     if len(sys.argv)!=3:
         raise Exception('输入两个版本号')

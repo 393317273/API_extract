@@ -41,6 +41,7 @@ def extractFullInterface(jsonDict):
             continue
         newJDKDict[f"{jsonDict[__classId]['Package']}.{jsonDict[__classId]['Interface']}"] = jsonDict[__classId]
     return newJDKDict
+#TODO: 写一个通用的递归对比函数，也许之后比对parameter有用
 '''
 输入两个method字典，整合并输出一个带有version键值对的字典
 '''
