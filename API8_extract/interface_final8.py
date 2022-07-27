@@ -136,13 +136,13 @@ def main():
                      Parameter_Mid = re.findall(r'<dd>(.*?)</dd>',str(Parameter_content1))
                      #Parameter_Candidate = []
                      Parameter = []
-                     Parameter_Throw = []
+                     #Parameter_Throw = []
                      for Candidate in Parameter_Mid:
                             if Candidate[0]!="<":continue #噪音 有时候会是return里的东西，比如null
                             elif len(re.findall(r'<a href',Candidate))!=0:
-                                   #TODO:有时候有<code>,有时候没有，哪些才是Throw？
-                                   Parameter_Throw.append(Candidate.split("</a>")[0].split('">')[-1])
-
+                                   #TODO:有时候有<code>,有时候没有，哪些才是Throw？还可能是SEE ALSO，这里先跳过
+                                   #Parameter_Throw.append(Candidate.split("</a>")[0].split('">')[-1])
+                                   continue
                             else:
                                    try:
                                           Parameter.append(re.findall(r'<code>(.*?)</code>',str(Candidate))[0])
