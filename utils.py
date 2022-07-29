@@ -41,7 +41,7 @@ def extractFullInterface(jsonDict):
             continue
         newJDKDict[f"{jsonDict[__classId]['Package']}.{jsonDict[__classId]['Interface']}"] = jsonDict[__classId]
     return newJDKDict
-#TODO: 写一个通用的递归对比函数，也许之后比对parameter有用
+#TODO: 将函数改为可递归（versionB可能含有多个版本信息）
 '''
 输入两个method字典，整合并输出一个带有version键值对的字典
 '''
@@ -54,14 +54,21 @@ def compareMethod(methodDictA,methodDictB,versionA,versionB):
         mergedMethod[method]["Exist_Version"] = [versionA]
     for method in list(set(B_method)-set(A_method)):
         mergedMethod[method] = methodDictB[method]
-        mergedMethod[method]["Exist_Version"] = [versionB]
+        if isinstance(versionB,int):
+            mergedMethod[method]["Exist_Version"] = [versionB]
+        else:
+            mergedMethod[method]["Exist_Version"] = versionB
     for method in list(set(B_method) & set(A_method)):
         mergedMethod[method] = methodDictA[method]
-        mergedMethod[method]["Exist_Version"] = [versionA,versionB]
+        if isinstance(versionB,int):
+            mergedMethod[method]["Exist_Version"] = [versionA,versionB]
+        else:
+            mergedMethod[method]["Exist_Version"] = [versionA]+versionB
     return mergedMethod
 '''
 输入两个JDK字典，用桶排序遍历键名，查询只在18出现的，两者皆有的，只在19出现的，然后返回
 '''
+# 如果输入的版本B是一个数组，JDKB也是经过合并处理的，你要怎么弄？
 def compareJDK(JDKA,JDKB,A_version,B_version):
     mergedJDK = {}
     JDKA_interface = JDKA.keys()
@@ -78,12 +85,22 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
             mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [A_version]
     for interface in list(interfaceOnlyinB):
         mergedJDK[interface] = JDKB[interface]
-        mergedJDK[interface]["Exist_Version"] = [B_version]
+        #TODO:把len法改成判断数据类型
+        if isinstance(B_version,int):
+            mergedJDK[interface]["Exist_Version"] = [B_version]
+        else:
+            mergedJDK[interface]["Exist_Version"] = B_version
         for methodName in mergedJDK[interface]["Method"]:
-            mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [B_version]         
+            if isinstance(B_version,int):
+                mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [B_version]         
+            else:
+                mergedJDK[interface]["Method"][methodName]["Exist_Version"] = B_version
     for interface in list(interfaceinBoth):
         mergedJDK[interface] = JDKA[interface]
-        mergedJDK[interface]["Exist_Version"] = [A_version,B_version]
+        if isinstance(B_version,int):
+            mergedJDK[interface]["Exist_Version"] = [A_version,B_version]
+        else:
+            mergedJDK[interface]["Exist_Version"] = [A_version]+B_version
         mergedMethod = compareMethod(JDKA[interface]["Method"],JDKB[interface]["Method"],A_version,B_version)
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK

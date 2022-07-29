@@ -115,6 +115,8 @@ def main():
               #print(imple_class3)
 
 
+#DONE:提取Method的Parameter
+              #从Method Detail提取 HTML符号是ul li l里的dd 名字在h4
               #------------------Method Detail:---------------------------------
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
               content = str(content_methon)
@@ -129,9 +131,28 @@ def main():
                      #print(methon)
 
                      #print("Parameter:")
-                     Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
-                     #print(Parameter_content1)
-                     Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
+                     Parameter_content1 = re.findall(r'<dl>(.*?)</dl>',menthon_list1[x1])
+                     #print(Parameter_content1)  
+                     #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
+                     Parameter_Mid = re.findall(r'<dd>(.*?)</dd>',str(Parameter_content1))
+                     #Parameter_Candidate = []
+                     Parameter = []
+                     #Parameter_Throw = []
+                     for Candidate in Parameter_Mid:
+                            if Candidate[0]!="<":continue #噪音 有时候会是return里的东西，比如null
+                            elif len(re.findall(r'<a href',Candidate))!=0:
+                                   #TODO:有时候有<code>,有时候没有，哪些才是Throw？还可能是SEE ALSO，这里先跳过
+                                   #Parameter_Throw.append(Candidate.split("</a>")[0].split('">')[-1])
+                                   continue
+                            else:
+                                   try:
+                                          Parameter.append(re.findall(r'<code>(.*?)</code>',str(Candidate))[0])
+                                   except:
+                                          continue
+                     #Parameter = re.findall(r'<code>(.*?)</code>',str(Parameter_Candidate))
+                     
+                     #若<code>包裹了<a href?>则这一块属于Throw
+                     #只有数字就是Since
                      #print(Parameter)
                       
                      #print("Throw:")
