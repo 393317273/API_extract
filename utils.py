@@ -57,13 +57,13 @@ def compareMethod(methodDictA,methodDictB,versionA,versionB):
         if isinstance(versionB,int):
             mergedMethod[method]["Exist_Version"] = [versionB]
         else:
-            mergedMethod[method]["Exist_Version"] = versionB
+            mergedMethod[method]["Exist_Version"] = methodDictB[method]["Exist_Version"]
     for method in list(set(B_method) & set(A_method)):
         mergedMethod[method] = methodDictA[method]
         if isinstance(versionB,int):
             mergedMethod[method]["Exist_Version"] = [versionA,versionB]
         else:
-            mergedMethod[method]["Exist_Version"] = [versionA]+versionB
+            mergedMethod[method]["Exist_Version"] = [versionA]+methodDictB[method]["Exist_Version"]
     return mergedMethod
 '''
 输入两个JDK字典，用桶排序遍历键名，查询只在18出现的，两者皆有的，只在19出现的，然后返回
@@ -89,18 +89,18 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
         if isinstance(B_version,int):
             mergedJDK[interface]["Exist_Version"] = [B_version]
         else:
-            mergedJDK[interface]["Exist_Version"] = B_version
+            mergedJDK[interface]["Exist_Version"] = JDKB[interface]["Exist_Version"] 
         for methodName in mergedJDK[interface]["Method"]:
             if isinstance(B_version,int):
                 mergedJDK[interface]["Method"][methodName]["Exist_Version"] = [B_version]         
             else:
-                mergedJDK[interface]["Method"][methodName]["Exist_Version"] = B_version
+                mergedJDK[interface]["Method"][methodName]["Exist_Version"] = JDKB[interface]["Method"][methodName]["Exist_Version"]
     for interface in list(interfaceinBoth):
         mergedJDK[interface] = JDKA[interface]
         if isinstance(B_version,int):
             mergedJDK[interface]["Exist_Version"] = [A_version,B_version]
         else:
-            mergedJDK[interface]["Exist_Version"] = [A_version]+B_version
+            mergedJDK[interface]["Exist_Version"] = [A_version]+JDKB[interface]["Exist_Version"]
         mergedMethod = compareMethod(JDKA[interface]["Method"],JDKB[interface]["Method"],A_version,B_version)
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK
