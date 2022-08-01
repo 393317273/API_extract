@@ -108,13 +108,7 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
 def detectParam(HTMLstring):
     soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
     print(soup.prettify())
-    #print(soup.dd.code)
-    #TODO:首先识别span class="paramlabel"，其他的span后面跟着的语句全部忽略
-    #可以的用法：识别soup.span的text,==Parameters
-    #识别parameter规则：span parameter下，每个dd标签下的第一个code.其实如果有parameter，第一个span就必定是，所以直接判断string匹配与否就是了
-    #不过dd没有被包裹在span内，所以只能用这个来判断parameter是否存在
-    #建议用span的sibling逐个遍历，sibling是换行符就直接跳过，遇到dd则取出里面的第一个code作为parameter则直到又遇到一个span
-    #先完成这个逻辑编写，再想怎么提parameter type
+    #TODO:把param type也顺便检测了吧
     Parameters = []
     try:
         if soup.span.attrs['class'][0] == "paramLabel":
@@ -127,5 +121,5 @@ def detectParam(HTMLstring):
                     param = sibling.code.string # dd块里的第一个code包裹的就是param
                     Parameters.append(param)
         return Parameters
-    except AttributeError:
+    except AttributeError: #不存在params的情况
         return Parameters
