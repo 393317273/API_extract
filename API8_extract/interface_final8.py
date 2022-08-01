@@ -5,8 +5,10 @@ import urllib.request
 import interface_link8
 import class_link8
 import json
-#TODO: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
+#DONE: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
+#TODO:会不会把deprecated也录进去？
+#TODO:同名方法无法检测到，会直接忽略掉第二个
 def removeSpace(inputStrList):
        inputIsStr = False
        if len(inputStrList)==0: return
@@ -115,6 +117,10 @@ def main():
 
               #DONE:提取Method的Parameter
               #从Method Detail提取 HTML符号是ul li l里的dd 名字在h4
+              #TODO: 提取interface的参数类型 在哪里啊？
+              #method detail里，有超链接
+              #<td class="colLast"><code><span class="memberNameLink"><a href="../../java/applet/AppletContext.html#getImage-java.net.URL-">getImage</a></span>(<a href="../../java/net/URL.html" title="class in java.net">URL</a>&nbsp;url)</code>
+              #td code span a href的最后一个部分
               #------------------Method Detail:---------------------------------
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
               content = str(content_methon)
@@ -123,36 +129,54 @@ def main():
               for j in p.findall(content):
                      menthon_list1.append(j)
               dict_method = dict()
+              Parameter_content1 = []
               for x1 in range(len(menthon_list1)):
+                     #先提取类型，然后按顺序赋予挖掘出来的
+
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     #print(methon)
-
+                     if methon[0] == "createContext": 
+                            print("stop")
+                     print(menthon_list1[x1])
+                     print("\n")
                      #print("Parameter:")
-                     Parameter_content1 = re.findall(r'<dl>(.*?)</dl>',menthon_list1[x1])
+                     #2022-8-1 基于正则表达式的参数识别宣布弃用 完全无法使用
+                     '''                  
+                     del Parameter_content1
+                     Parameter_content1 = re.findall(r'<dt><span class="paramLabel">(.*?)<span class="returnLabel">',menthon_list1[x1])
+                     if len(Parameter_content1) == 0:
+                     #没有return标
+                            Parameter_content1 = re.findall(r'<dt><span class="paramLabel">(.*?)</dl>\\n',menthon_list1[x1])
                      #print(Parameter_content1)  
-                     #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
-                     Parameter_Mid = re.findall(r'<dd>(.*?)</dd>',str(Parameter_content1))
+                     #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),',str(Parameter_content1))
+                     #Parameter_Mid = re.findall(r'<dd>(.*?)</dd>',str(Parameter_content1))
                      #Parameter_Candidate = []
                      Parameter = []
                      #Parameter_Throw = []
-                     for Candidate in Parameter_Mid:
-                            if Candidate[0]!="<":continue #噪音 有时候会是return里的东西，比如null
-                            elif len(re.findall(r'<a href',Candidate))!=0:
-                                   #TODO:有时候有<code>,有时候没有，哪些才是Throw？还可能是SEE ALSO，这里先跳过
-                                   #Parameter_Throw.append(Candidate.split("</a>")[0].split('">')[-1])
+                     for Candidate in re.findall(r'<code>(.*?)</code> -??',str(Parameter_content1)):
+                            if not Candidate.isalpha():
                                    continue
-                            else:
-                                   try:
-                                          Parameter.append(re.findall(r'<code>(.*?)</code>',str(Candidate))[0])
-                                   except:
-                                          continue
+                            elif re.findall(r'null',Candidate)!=[]: continue #null failsafe，按规则应该不会识别到
+                            Parameter.append(Candidate)
                      #Parameter = re.findall(r'<code>(.*?)</code>',str(Parameter_Candidate))
-                     
+                     '''
                      #若<code>包裹了<a href?>则这一块属于Throw
                      #只有数字就是Since
                      #print(Parameter)
-                     
+                     Parameter_Type = []
+                     #TODO:parameter参数类型提取的部分里面有的并不是超链接，比如Int
+                     #甚至还有javax.script.Bindings.SimpleBindings.putAll(Map<? extends String,? extends Object> toMerge)这样的 这种线忽略掉
+                     #两种情况举例：java.aws.ScrollPaneAdjustable的	removeAdjustmentListener 和 setMinimum
+                     #"['void&nbsp;setMinimum(int&nbsp;min)']"
+                     #2022-8-1 要不转换思路，从另一个位置进行读取吧 从<td class="colLast">这里提取
+                     for p in Parameter:
+                            #match_Sequence = rf'title=".*?">(.*?)</a>&nbsp;{p}\)</code>'
+                            p_type_mid = re.findall(r'<pre>(.*?)</pre>',menthon_list1[x1])
+                            p_type = str(p_type_mid).split(f"</a>&nbsp;{p}")[0].split(">")[-1]
+                            if p_type[0].isalpha():
+                                   Parameter_Type.append(p_type)
+                            else:
+                                   print(p_type)
                      #print("Throw:")
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
                      #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
@@ -162,9 +186,8 @@ def main():
                      else:
                             throw = []
                      
-                     
+                     #TODO: 有的包会存在同名方法（譬如java.util.concurrent.LinkedTransferQueue.try），这样处理的话会被覆盖！
                      dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
-                     
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
                      json_num+=1
