@@ -1,3 +1,4 @@
+from posixpath import abspath
 import re
 from unittest import result
 from urllib import response
@@ -5,6 +6,12 @@ import urllib.request
 import interface_link8
 import class_link8
 import json
+import sys
+import os 
+absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
+sys.path.append(abspath)
+sys.path.append(os.getcwd())
+from utils import detectParam
 #DONE: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
 #TODO:会不会把deprecated也录进去？
@@ -137,10 +144,11 @@ def main():
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
                      if methon[0] == "createContext": 
                             print("stop")
-                     print(menthon_list1[x1])
-                     print("\n")
+                     Parameter = detectParam(str(menthon_list1[0]))
+                     print(Parameter)
                      #print("Parameter:")
-                     #2022-8-1 基于正则表达式的参数识别宣布弃用 完全无法使用
+                     #2022-8-1 基于正则表达式的参数识别宣布弃用 完全无法使用,使用bs4
+
                      '''                  
                      del Parameter_content1
                      Parameter_content1 = re.findall(r'<dt><span class="paramLabel">(.*?)<span class="returnLabel">',menthon_list1[x1])

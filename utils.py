@@ -1,4 +1,4 @@
-from heapq import merge
+from bs4 import BeautifulSoup as bs, NavigableString
 import json
 def loadJson(path,version):
     with open(path,'r') as f:
@@ -104,3 +104,28 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
         mergedMethod = compareMethod(JDKA[interface]["Method"],JDKB[interface]["Method"],A_version,B_version)
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK
+
+def detectParam(HTMLstring):
+    soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
+    print(soup.prettify())
+    #print(soup.dd.code)
+    #TODO:首先识别span class="paramlabel"，其他的span后面跟着的语句全部忽略
+    #可以的用法：识别soup.span的text,==Parameters
+    #识别parameter规则：span parameter下，每个dd标签下的第一个code.其实如果有parameter，第一个span就必定是，所以直接判断string匹配与否就是了
+    #不过dd没有被包裹在span内，所以只能用这个来判断parameter是否存在
+    #建议用span的sibling逐个遍历，sibling是换行符就直接跳过，遇到dd则取出里面的第一个code作为parameter则直到又遇到一个span
+    #先完成这个逻辑编写，再想怎么提parameter type
+    Parameters = []
+    try:
+        if soup.span.attrs['class'][0] == "paramLabel":
+
+            iterateStart_Point = soup.span.previous_element.next_siblings #跳出span，从dt的下一个兄弟节点开始遍历 用next_siblings方法构建遍历器
+            for sibling in iterateStart_Point:
+                if isinstance(sibling,NavigableString):continue #换行符跳过
+                if sibling.name == "dt":break # 到下一个包裹了span的dt，可能是return也可能是throw，就直接跳出
+                if sibling.name == "dd":
+                    param = sibling.code.string # dd块里的第一个code包裹的就是param
+                    Parameters.append(param)
+        return Parameters
+    except AttributeError:
+        return Parameters
