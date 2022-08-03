@@ -1,21 +1,212 @@
-'\\n
-<h4>getAudioClip</h4>
-\\n
-<pre><a href="../../java/applet/AudioClip.html" title="interface in java.applet">AudioClip</a>&nbsp;getAudioClip(<a href="../../java/net/URL.html" title="class in java.net">URL</a>&nbsp;url)</pre>
-\\n
-<div class="block">Creates an audio clip.</div>
-\\n
-<dl>
-  \\n
-  <dt><span class="paramLabel">Parameters:</span></dt>
-  \\n
+<h4>
+  createContext
+ </h4>
+ \n
+ <pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
+ \n
+ <div class="block">
+  Creates and returns a
+  <a href="../../java/awt/PaintContext.html" title="interface in java.awt">
+   <code>
+    PaintContext
+   </code>
+  </a>
+  used to\n generate the color pattern.\n The arguments to this method convey additional information\n about the rendering operation that may be\n used or ignored on various implementations of the  
+  <code>
+   Paint
+  </code>
+  interface.\n A caller must pass non-
+  <code>
+   null
+  </code>
+  values for all of the arguments\n except for the
+  <code>
+   ColorModel
+  </code>
+  argument which may be
+  <code>
+   null
+  </code>
+  to\n indicate that no specific
+  <code>
+   ColorModel
+  </code>
+  type is preferred.\n Implementations of the
+  <code>
+   Paint
+  </code>
+  interface are allowed to use or ignore\n any of the arguments as makes sense for their function, and are\n not constrained to use the specified
+  <code>
+   ColorModel
+  </code>
+  for the returned\n
+  <code>
+   PaintContext
+  </code>
+  , even if it is not
+  <code>
+   null
+  </code>
+  .\n Implementations are allowed to throw
+  <code>
+   NullPointerException
+  </code>
+  for\n any
+  <code>
+   null
+  </code>
+  argument other than the
+  <code>
+   ColorModel
+  </code>
+  argument,\n but are not required to do so.
+ </div>
+ \n
+ <dl>
+  \n
+  <dt>
+   <span class="paramLabel">
+    Parameters:
+   </span>
+  </dt>
+  \n
   <dd>
-    <code>url</code> - an absolute URL giving the location of the audio clip.
+   <code>
+    cm
+   </code>
+   - the preferred
+   <a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">
+    <code>
+     ColorModel
+    </code>
+   </a>
+   which represents the most convenient\n           format for the caller to receive the pixel data, or
+   <code>
+    null
+   </code>
+   \n           if there is no preference.
   </dd>
-  \\n
-  <dt><span class="returnLabel">Returns:</span></dt>
-  \\n
-  <dd>the audio clip at the specified URL.</dd>
-  \\n
-</dl>
-\\n'
+  \n
+  <dd>
+   <code>
+    deviceBounds
+   </code>
+   - the device space bounding box\n                     of the graphics primitive being rendered.\n                     Implementations of the
+   <code>
+    Paint
+   </code>
+   interface\n                     are allowed to throw
+   <code>
+    NullPointerException
+   </code>
+   \n                     for a
+   <code>
+    null
+   </code>
+   <code>
+    deviceBounds
+   </code>
+   .
+  </dd>
+  \n
+  <dd>
+   <code>
+    userBounds
+   </code>
+   - the user space bounding box\n                   of the graphics primitive being rendered.\n                     Implementations of the
+   <code>
+    Paint
+   </code>
+   interface\n                     are allowed to throw
+   <code>
+    NullPointerException
+   </code>
+   \n                     for a
+   <code>
+    null
+   </code>
+   <code>
+    userBounds
+   </code>
+   .
+  </dd>
+  \n
+  <dd>
+   <code>
+    xform
+   </code>
+   - the
+   <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">
+    <code>
+     AffineTransform
+    </code>
+   </a>
+   from user\n              space into device space.\n                     Implementations of the
+   <code>
+    Paint
+   </code>
+   interface\n                     are allowed to throw
+   <code>
+    NullPointerException
+   </code>
+   \n                     for a
+   <code>
+    null
+   </code>
+   <code>
+    xform
+   </code>
+   .
+  </dd>
+  \n
+  <dd>
+   <code>
+    hints
+   </code>
+   - the set of hints that the context object can use to\n              choose between rendering alternatives.\n                     Implementations of the
+   <code>
+    Paint
+   </code>
+   interface\n                     are allowed to throw
+   <code>
+    NullPointerException
+   </code>
+   \n                     for a
+   <code>
+    null
+   </code>
+   <code>
+    hints
+   </code>
+   .
+  </dd>
+  \n
+  <dt>
+   <span class="returnLabel">
+    Returns:
+   </span>
+  </dt>
+  \n
+  <dd>
+   the
+   <code>
+    PaintContext
+   </code>
+   for\n         generating color patterns.
+  </dd>
+  \n
+  <dt>
+   <span class="seeLabel">
+    See Also:
+   </span>
+  </dt>
+  \n
+   <a href="../../java/awt/RenderingHints.html" title="class in java.awt">
+    <code>
+     RenderingHints
+    </code>
+   </a>
+  </dd>
+  \n
+ </dl>
+ \n

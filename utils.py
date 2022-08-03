@@ -1,5 +1,7 @@
+from types import NoneType
 from bs4 import BeautifulSoup as bs, NavigableString
 import json
+import re
 def loadJson(path,version):
     with open(path,'r') as f:
         jsonDict = json.load(f)
@@ -105,11 +107,23 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK
 
-def detectParam(HTMLstring):
+def detectParam(HTMLstring,methon):
     soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
     print(soup.prettify())
-    #TODO:把param type也顺便检测了吧
+    #TODO:把param type也顺便检测了吧    
+    #参数类型在这段中的pre标签可以找到，建议调试看看出来个啥
+    #并不是所有数据类型都会被a标签包裹,比如int类型，这些要另外想办法。
+    #type1:<pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> 
+    # createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           
+    # <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           
+    # <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           
+    # <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           
+    # <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
+    #type2:<pre>void setMaximum(int max)</pre>
+    #获取pre标签，匹配并取出函数名和完整形参列表
+    #三种情况：只有a标签，完全没有a标签，二者混杂
     Parameters = []
+    params = {}
     try:
         if soup.span.attrs['class'][0] == "paramLabel":
 
@@ -120,6 +134,58 @@ def detectParam(HTMLstring):
                 if sibling.name == "dd":
                     param = sibling.code.string # dd块里的第一个code包裹的就是param
                     Parameters.append(param)
+        #先获取函数名与完整形参列表
+        #fullMethod = str(soup.find(string = re.compile(f"{methon}\((.*?)\)"))).split("(")[1][:-1].replace(u'\xa0', u' ')
+        fullMethod = soup.pre.contents
+        if len(Parameters) != 0:
+            for param in Parameters:
+                for i in range(len(fullMethod)):
+                    if len(re.find(f'{param}',fullMethod[i]))!=0:
+                        #你这么匹配会不会遇上误匹配的情况？比如另一个param包含了此param的全部字符
+                        params[f'{param}'] = fullMethod[i-1]
         return Parameters
-    except AttributeError: #不存在params的情况
+    except (AttributeError,IndexError): #不存在params的情况
         return Parameters
+
+def detectFullParams(HTMLstring,methon):
+    #TODO:干脆全部都在pre里面提取，提取完参数类型提取参数得了
+    params = {}
+    soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
+    paramContainer_Mid = soup.pre.contents
+    paramContainer = [str(x) for x in paramContainer_Mid]
+    fullContent = ' '.join(paramContainer)
+    fullContent = str(fullContent).replace(u'\xa0', u' ')
+    #print(fullContent)
+    methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
+    #按换行符split并在for中分别做成soup
+    if methodContent[0] == '()':
+        return params
+    for methodSentence in methodContent:
+        methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
+        if not isinstance(methodSoup.a,NoneType):
+            #这一行有a，就是有超链接指向的非自定义类型
+            methodType = str(methodSoup.a.next)
+            methodName = str(methodSoup.a.next.next)
+            methodName = ''.join([x for x in methodName if x.isalpha()])
+            
+            
+        else:
+            #这一行没a 内置数据类型
+            (methodType,methodName) = [x for x in methodSentence.split(' ') if x!='']
+            methodType = ''.join([x for x in methodType if x.isalpha()])
+            methodName = ''.join([x for x in methodName if x.isalpha()])
+        params[methodName] = methodType
+    
+    #type1:<pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> 
+    # createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           
+    # <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           
+    # <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           
+    # <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           
+    # <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
+    #type2:<pre>void setMaximum(int max)</pre>
+    #先做成soup检测有没有a标签，有的话优先提出来，再去处理剩下的
+    return params
+
+
+
+

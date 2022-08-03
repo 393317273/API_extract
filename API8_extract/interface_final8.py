@@ -11,7 +11,7 @@ import os
 absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
 sys.path.append(abspath)
 sys.path.append(os.getcwd())
-from utils import detectParam
+from utils import detectFullParams
 #DONE: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
 #TODO:会不会把deprecated也录进去？
@@ -124,7 +124,7 @@ def main():
 
               #DONE:提取Method的Parameter
               #从Method Detail提取 HTML符号是ul li l里的dd 名字在h4
-              #TODO: 提取interface的参数类型 在哪里啊？
+              #DONE: 提取interface的参数类型 在哪里啊？
               #method detail里，有超链接
               #<td class="colLast"><code><span class="memberNameLink"><a href="../../java/applet/AppletContext.html#getImage-java.net.URL-">getImage</a></span>(<a href="../../java/net/URL.html" title="class in java.net">URL</a>&nbsp;url)</code>
               #td code span a href的最后一个部分
@@ -139,13 +139,11 @@ def main():
               Parameter_content1 = []
               for x1 in range(len(menthon_list1)):
                      #先提取类型，然后按顺序赋予挖掘出来的
-
+                     #TODO:有的方法名重复，仅形参不同，想个办法
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     if methon[0] == "createContext": 
-                            print("stop")
-                     Parameter = detectParam(str(menthon_list1[0]))
-                     print(Parameter)
+                     Parameter = detectFullParams(str(menthon_list1[x1]),methon)
+                     #print(Parameter)
                      #print("Parameter:")
                      #2022-8-1 基于正则表达式的参数识别宣布弃用 完全无法使用,使用bs4
 
@@ -177,6 +175,7 @@ def main():
                      #两种情况举例：java.aws.ScrollPaneAdjustable的	removeAdjustmentListener 和 setMinimum
                      #"['void&nbsp;setMinimum(int&nbsp;min)']"
                      #2022-8-1 要不转换思路，从另一个位置进行读取吧 从<td class="colLast">这里提取
+                     '''
                      for p in Parameter:
                             #match_Sequence = rf'title=".*?">(.*?)</a>&nbsp;{p}\)</code>'
                             p_type_mid = re.findall(r'<pre>(.*?)</pre>',menthon_list1[x1])
@@ -185,6 +184,7 @@ def main():
                                    Parameter_Type.append(p_type)
                             else:
                                    print(p_type)
+                     '''
                      #print("Throw:")
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
                      #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
@@ -195,7 +195,7 @@ def main():
                             throw = []
                      
                      #TODO: 有的包会存在同名方法（譬如java.util.concurrent.LinkedTransferQueue.try），这样处理的话会被覆盖！
-                     dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
+                     dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
                      json_num+=1
