@@ -1,10 +1,18 @@
+from posixpath import abspath
 import re
 from unittest import result
 from urllib import response
 import urllib.request
 import interface_link11
-#import class_link
+import class_link11
 import json
+import sys
+import os 
+absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
+sys.path.append(abspath)
+sys.path.append(os.getcwd())
+
+from utils import detectFullParams
 #TODO: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
 def removeSpace(inputStrList):
@@ -126,18 +134,21 @@ def main():
               for x1 in range(len(menthon_list1)):
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     #print(methon)
+                     if methon[0] == 'fields':
+                            print("stop")
+                     Parameter = detectFullParams(str(menthon_list1[x1]),methon)
 
-                     #print("Parameter:")
+                     '''#print("Parameter:")
                      Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
                      #print(Parameter_content1)
                      Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre>',str(Parameter_content1))
                      #print(Parameter)
                      
-                     #print("Throw:")
+                     #print("Throw:")'''
+                     Parameter_Type = []
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
                      if re.search(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content)):
-                            throwtext = re.search(r'<dd><code><a href=".+title="class in (.*?)"></a></code>',str(throw_content))
+                            throwtext = re.search(r'<dd><code><a href=".+title="class in (.*?)">(.*?)</a></code>',str(throw_content))
                             throw = throwtext.group(1)+'.'+throwtext.group(2)
                      else:
                             throw = []
@@ -145,7 +156,7 @@ def main():
                      #print(throw)
                      
                      
-                     dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
+                     dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
                      
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)

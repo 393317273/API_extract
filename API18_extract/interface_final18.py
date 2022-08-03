@@ -1,10 +1,18 @@
+from posixpath import abspath
 import re
 from unittest import result
 from urllib import response
 import urllib.request
 import interface_link18
-#import class_link
+import class_link18
 import json
+import sys
+import os 
+absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
+sys.path.append(abspath)
+sys.path.append(os.getcwd())
+
+from utils import detectFullParams
 #TODO: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
 def removeSpace(inputStrList):
@@ -128,14 +136,17 @@ def main():
               for x1 in range(len(menthon_list1)):
                      #print("Methon:")
                      methon = re.findall(r'<h3>(.*?)</h3>',menthon_list1[x1])
-                     #print(methon)
+                     if methon[0] == 'fields':
+                            print("stop")
+                     Parameter = detectFullParams(str(menthon_list1[x1]),methon)
 
+                     Parameter_Type = []
                      
                      #Parameter_content1 = re.findall(r'<pre>.*\((.*?)\)',menthon_list1[x1])
                      #print(Parameter_content1)
                      #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?)[)]</pre>',str(Parameter_content1))
                      
-                     Parameter = re.findall(r'<section class="detail" id.*?[(](.*?)[)]">',menthon_list1[x1])
+                     '''Parameter = re.findall(r'<section class="detail" id.*?[(](.*?)[)]">',menthon_list1[x1])'''
                      #print(Parameter)
                      
                     

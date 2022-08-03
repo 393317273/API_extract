@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs, NavigableString
 import json
 import re
+#from types import NoneType
 def loadJson(path,version):
     with open(path,'r') as f:
         jsonDict = json.load(f)
