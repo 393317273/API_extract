@@ -1,10 +1,18 @@
+from posixpath import abspath
 import re
 from unittest import result
 from urllib import response
 import urllib.request
 import interface_link9
-#import class_link
+import class_link9
 import json
+import sys
+import os 
+absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
+sys.path.append(abspath)
+sys.path.append(os.getcwd())
+
+from utils import detectFullParams
 #TODO: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
 def removeSpace(inputStrList):
@@ -126,36 +134,34 @@ def main():
                      menthon_list1.append(j)
               dict_method = dict()
               for x1 in range(len(menthon_list1)):
+                     #先提取类型，然后按顺序赋予挖掘出来的
+
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
-                     #print(methon)
-
-                     #print("Parameter:")
-                     Parameter_content1 = re.findall(r'<dl>(.*?)</dl>',menthon_list1[x1])
-                     #print(Parameter_content1)  
-                     #Parameter = re.findall(r'title="class in(.*?)">(.*?)</a>&nbsp;(.*?),''',str(Parameter_content1))
-                     Parameter_Mid = re.findall(r'<dd>(.*?)</dd>',str(Parameter_content1))
-                     #Parameter_Candidate = []
-                     Parameter = []
-                     #Parameter_Throw = []
-                     for Candidate in Parameter_Mid:
-                            if Candidate[0]!="<":continue #噪音 有时候会是return里的东西，比如null
-                            elif len(re.findall(r'<a href',Candidate))!=0:
-                                   #TODO:有时候有<code>,有时候没有，哪些才是Throw？还可能是SEE ALSO，这里先跳过
-                                   #Parameter_Throw.append(Candidate.split("</a>")[0].split('">')[-1])
-                                   continue
-                            else:
-                                   try:
-                                          Parameter.append(re.findall(r'<code>(.*?)</code>',str(Candidate))[0])
-                                   except:
-                                          continue
-                     #Parameter = re.findall(r'<code>(.*?)</code>',str(Parameter_Candidate))
-                     
-                     #若<code>包裹了<a href?>则这一块属于Throw
+                     Parameter = detectFullParams(str(menthon_list1[x1]),methon)
+                     '''if methon[0] == "createContext": 
+                            print("stop")
+                     print(menthon_list1[x1])
+                     print("\n")
+                     Parameter = detectParam(str(menthon_list1[0]))
+                     print(Parameter)'''
+                                          #若<code>包裹了<a href?>则这一块属于Throw
                      #只有数字就是Since
                      #print(Parameter)
-                      
-                     #print("Throw:")
+                     Parameter_Type = []
+                     #TODO:parameter参数类型提取的部分里面有的并不是超链接，比如Int
+                     #甚至还有javax.script.Bindings.SimpleBindings.putAll(Map<? extends String,? extends Object> toMerge)这样的 这种线忽略掉
+                     #两种情况举例：java.aws.ScrollPaneAdjustable的	removeAdjustmentListener 和 setMinimum
+                     #"['void&nbsp;setMinimum(int&nbsp;min)']"
+                     #2022-8-1 要不转换思路，从另一个位置进行读取吧 从<td class="colLast">这里提取
+                     '''for p in Parameter:
+                            #match_Sequence = rf'title=".*?">(.*?)</a>&nbsp;{p}\)</code>'
+                            p_type_mid = re.findall(r'<pre>(.*?)</pre>',menthon_list1[x1])
+                            p_type = str(p_type_mid).split(f"</a>&nbsp;{p}")[0].split(">")[-1]
+                            if p_type[0].isalpha():
+                                   Parameter_Type.append(p_type)
+                            else:
+                                   print(p_type) '''
                      throw_content = re.findall(r'<dt><span class="throwsLabel">(.*?)</dl>',menthon_list1[x1])
                      #throw = re.findall(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content))
                      if re.search(r'<dd><code><a href=".+">(.*?)</a></code>',str(throw_content)):
@@ -165,7 +171,7 @@ def main():
                             throw = []
                      
                      
-                     dict_method[str(methon[0])]={"Parameter":removeSpace(Parameter),"Throw":throw}
+                     dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
                      
               try:
                      result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
