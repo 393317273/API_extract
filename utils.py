@@ -1,4 +1,3 @@
-from types import NoneType
 from bs4 import BeautifulSoup as bs, NavigableString
 import json
 import re
@@ -107,45 +106,6 @@ def compareJDK(JDKA,JDKB,A_version,B_version):
         mergedJDK[interface]["Method"] = mergedMethod
     return mergedJDK
 
-def detectParam(HTMLstring,methon):
-    soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
-    print(soup.prettify())
-    #TODO:把param type也顺便检测了吧    
-    #参数类型在这段中的pre标签可以找到，建议调试看看出来个啥
-    #并不是所有数据类型都会被a标签包裹,比如int类型，这些要另外想办法。
-    #type1:<pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> 
-    # createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           
-    # <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           
-    # <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           
-    # <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           
-    # <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
-    #type2:<pre>void setMaximum(int max)</pre>
-    #获取pre标签，匹配并取出函数名和完整形参列表
-    #三种情况：只有a标签，完全没有a标签，二者混杂
-    Parameters = []
-    params = {}
-    try:
-        if soup.span.attrs['class'][0] == "paramLabel":
-
-            iterateStart_Point = soup.span.previous_element.next_siblings #跳出span，从dt的下一个兄弟节点开始遍历 用next_siblings方法构建遍历器
-            for sibling in iterateStart_Point:
-                if isinstance(sibling,NavigableString):continue #换行符跳过
-                if sibling.name == "dt":break # 到下一个包裹了span的dt，可能是return也可能是throw，就直接跳出
-                if sibling.name == "dd":
-                    param = sibling.code.string # dd块里的第一个code包裹的就是param
-                    Parameters.append(param)
-        #先获取函数名与完整形参列表
-        #fullMethod = str(soup.find(string = re.compile(f"{methon}\((.*?)\)"))).split("(")[1][:-1].replace(u'\xa0', u' ')
-        fullMethod = soup.pre.contents
-        if len(Parameters) != 0:
-            for param in Parameters:
-                for i in range(len(fullMethod)):
-                    if len(re.find(f'{param}',fullMethod[i]))!=0:
-                        #你这么匹配会不会遇上误匹配的情况？比如另一个param包含了此param的全部字符
-                        params[f'{param}'] = fullMethod[i-1]
-        return Parameters
-    except (AttributeError,IndexError): #不存在params的情况
-        return Parameters
 
 def detectFullParams(HTMLstring,methon):
     #TODO:干脆全部都在pre里面提取，提取完参数类型提取参数得了
@@ -153,8 +113,7 @@ def detectFullParams(HTMLstring,methon):
     soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
     paramContainer_Mid = soup.pre.contents
     paramContainer = [str(x) for x in paramContainer_Mid]
-    fullContent = ' '.join(paramContainer)
-    fullContent = str(fullContent).replace(u'\xa0', u' ')
+    fullContent =''.join([x for x in ' '.join(paramContainer) if x.isprintable()])#去除一系列不可见字符
     #print(fullContent)
     methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
     #按换行符split并在for中分别做成soup
