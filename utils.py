@@ -113,7 +113,7 @@ def detectFullParams(HTMLstring,methon):
     soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
     paramContainer_Mid = soup.pre.contents
     paramContainer = [str(x) for x in paramContainer_Mid]
-    fullContent =''.join([x for x in ' '.join(paramContainer) if x.isprintable()])#去除一系列不可见字符
+    fullContent =''.join([x for x in ' '.join(paramContainer).replace('\xa0',' ') if x.isprintable()])#去除一系列不可见字符并保留空格
     #print(fullContent)
     methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
     #按换行符split并在for中分别做成soup
@@ -121,7 +121,7 @@ def detectFullParams(HTMLstring,methon):
         return params
     for methodSentence in methodContent:
         methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
-        if not isinstance(methodSoup.a,NoneType):
+        if not isinstance(methodSoup.a,type(None)):
             #这一行有a，就是有超链接指向的非自定义类型
             methodType = str(methodSoup.a.next)
             methodName = str(methodSoup.a.next.next)

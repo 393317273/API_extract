@@ -133,11 +133,14 @@ def main():
               for j in p.findall(content):
                      menthon_list1.append(j)
               dict_method = dict()
+
               for x1 in range(len(menthon_list1)):
                      #先提取类型，然后按顺序赋予挖掘出来的
 
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
+                     if methon[0] == 'fields':
+                         print("stop")
                      Parameter = detectFullParams(str(menthon_list1[x1]),methon)
                      '''if methon[0] == "createContext": 
                             print("stop")
