@@ -112,39 +112,42 @@ def detectFullParams(HTMLstring,methon):
     #TODO:干脆全部都在pre里面提取，提取完参数类型提取参数得了
     params = {}
     soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
-    paramContainer_Mid = soup.pre.contents
-    paramContainer = [str(x) for x in paramContainer_Mid]
-    fullContent =''.join([x for x in ' '.join(paramContainer).replace('\xa0',' ') if x.isprintable()])#去除一系列不可见字符并保留空格
-    #print(fullContent)
-    methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
-    #按换行符split并在for中分别做成soup
-    if methodContent[0] == '()':
+    try:
+        paramContainer_Mid = soup.pre.contents
+        paramContainer = [str(x) for x in paramContainer_Mid]
+        fullContent =''.join([x for x in ' '.join(paramContainer).replace('\xa0',' ') if x.isprintable()])#去除一系列不可见字符并保留空格
+        #print(fullContent)
+        methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
+        #按换行符split并在for中分别做成soup
+        if methodContent[0] == '()':
+            return params
+        for methodSentence in methodContent:
+            methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
+            if not isinstance(methodSoup.a,type(None)):
+                #这一行有a，就是有超链接指向的非自定义类型
+                methodType = str(methodSoup.a.next)
+                methodName = str(methodSoup.a.next.next)
+                methodName = ''.join([x for x in methodName if x.isalpha()])
+                
+                
+            else:
+                #这一行没a 内置数据类型
+                (methodType,methodName) = [x for x in methodSentence.split(' ') if x!='']
+                methodType = ''.join([x for x in methodType if x.isalpha()])
+                methodName = ''.join([x for x in methodName if x.isalpha()])
+            params[methodName] = methodType
+        
+        #type1:<pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> 
+        # createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           
+        # <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           
+        # <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           
+        # <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           
+        # <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
+        #type2:<pre>void setMaximum(int max)</pre>
+        #先做成soup检测有没有a标签，有的话优先提出来，再去处理剩下的
         return params
-    for methodSentence in methodContent:
-        methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
-        if not isinstance(methodSoup.a,type(None)):
-            #这一行有a，就是有超链接指向的非自定义类型
-            methodType = str(methodSoup.a.next)
-            methodName = str(methodSoup.a.next.next)
-            methodName = ''.join([x for x in methodName if x.isalpha()])
-            
-            
-        else:
-            #这一行没a 内置数据类型
-            (methodType,methodName) = [x for x in methodSentence.split(' ') if x!='']
-            methodType = ''.join([x for x in methodType if x.isalpha()])
-            methodName = ''.join([x for x in methodName if x.isalpha()])
-        params[methodName] = methodType
-    
-    #type1:<pre><a href="../../java/awt/PaintContext.html" title="interface in java.awt">PaintContext</a> 
-    # createContext(<a href="../../java/awt/image/ColorModel.html" title="class in java.awt.image">ColorModel</a> cm,\n                           
-    # <a href="../../java/awt/Rectangle.html" title="class in java.awt">Rectangle</a> deviceBounds,\n                           
-    # <a href="../../java/awt/geom/Rectangle2D.html" title="class in java.awt.geom">Rectangle2D</a> userBounds,\n                           
-    # <a href="../../java/awt/geom/AffineTransform.html" title="class in java.awt.geom">AffineTransform</a> xform,\n                           
-    # <a href="../../java/awt/RenderingHints.html" title="class in java.awt">RenderingHints</a> hints)</pre>
-    #type2:<pre>void setMaximum(int max)</pre>
-    #先做成soup检测有没有a标签，有的话优先提出来，再去处理剩下的
-    return params
+    except AttributeError:
+        return params
 
 
 
