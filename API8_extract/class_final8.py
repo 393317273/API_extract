@@ -147,7 +147,7 @@ def main():
                             dict_field={}
               #print(dict_field1)
 
-
+              #TODO：重新组织数据结构，用字典列表
               #------------------Method Detail:---------------------------------
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',class_html,re.S)
               content = str(content_methon)
