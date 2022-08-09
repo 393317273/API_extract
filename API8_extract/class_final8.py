@@ -147,11 +147,12 @@ def main():
                             dict_field={}
               #print(dict_field1)
 
-
+              #TODO：重新组织数据结构，用字典列表
               #------------------Method Detail:---------------------------------
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',class_html,re.S)
               content = str(content_methon)
               menthon_list1 = list()
+              method_DictList = []
               p = re.compile('<li class="blockList">(.*?)</li>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
@@ -184,9 +185,10 @@ def main():
                             throw = []
  
                      #dict_method1 = {"method":methon,"Parameter":Parameter,"Throw":throw}
-                     dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+                     #dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+                     method_DictList.append({str(methon[0]):{"Parameter":Parameter,"Throw":throw}})
               try:
-                     result_dict[json_num] = merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,dict_method)
+                     result_dict[json_num] = merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,method_DictList)
                      json_num+=1
               except:
                      continue
