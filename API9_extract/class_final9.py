@@ -157,6 +157,7 @@ def main():
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',class_html,re.S)
               content = str(content_methon)
               menthon_list1 = list()
+              method_DictList = []
               p = re.compile('<li class="blockList">(.*?)</li>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
@@ -187,10 +188,11 @@ def main():
                             throw = throwtext.group(1)+'.'+throwtext.group(2)
                      else:
                             throw = []
-                     dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+                     #dict_method[str(methon[0])] = {"Parameter":Parameter,"Throw":throw}
+                     method_DictList.append({str(methon[0]):{"Parameter":Parameter,"Throw":throw}})
                      
               try:
-                     result_dict[json_num] = merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,dict_method)
+                     result_dict[json_num] = merge(extend_list,m2,m3,imple_interface3,imple_interface31,imple_class32,dict_field,method_DictList)
                      json_num+=1
               except:
                      continue

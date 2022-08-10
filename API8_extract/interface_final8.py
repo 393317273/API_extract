@@ -11,6 +11,7 @@ import os
 absPath = os.path.abspath(os.path.join(os.getcwd(),".."))
 sys.path.append(abspath)
 sys.path.append(os.getcwd())
+
 from utils import detectFullParams
 #DONE: 改进正则表达式，去掉interface,method,subinterface可能出现的空格
 # interface是str，method给到是元组，subinterface一般是list
@@ -124,6 +125,7 @@ def main():
 
               #DONE:提取Method的Parameter
               #从Method Detail提取 HTML符号是ul li l里的dd 名字在h4
+             
               #DONE: 提取interface的参数类型 在哪里啊？
               #method detail里，有超链接
               #<td class="colLast"><code><span class="memberNameLink"><a href="../../java/applet/AppletContext.html#getImage-java.net.URL-">getImage</a></span>(<a href="../../java/net/URL.html" title="class in java.net">URL</a>&nbsp;url)</code>
@@ -132,16 +134,19 @@ def main():
               content_methon = re.findall('<h3>Method Detail</h3>(.*?)<!-- ========= END OF CLASS DATA ========= -->',interface_html,re.S)
               content = str(content_methon)
               menthon_list1 = list()
+              method_DictList = []
               p = re.compile('<li class="blockList">(.*?)</li>',re.S)
               for j in p.findall(content):
                      menthon_list1.append(j)
               dict_method = dict()
-              Parameter_content1 = []
+              Parameter_content1 = [] 
               for x1 in range(len(menthon_list1)):
                      #先提取类型，然后按顺序赋予挖掘出来的
+
                      #TODO:有的方法名重复，仅形参不同，想个办法
                      #print("Methon:")
                      methon = re.findall(r'<h4>(.*?)</h4>',menthon_list1[x1])
+
                      Parameter = detectFullParams(str(menthon_list1[x1]),methon)
                      #print(Parameter)
                      #print("Parameter:")
@@ -195,9 +200,11 @@ def main():
                             throw = []
                      
                      #TODO: 有的包会存在同名方法（譬如java.util.concurrent.LinkedTransferQueue.try），这样处理的话会被覆盖！
-                     dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
+                    
+                     #dict_method[str(methon[0])]={"Parameter":Parameter,"Throw":throw}
+                     method_DictList.append({str(methon[0]):{"Parameter":Parameter,"Throw":throw}})
               try:
-                     result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,dict_method)
+                     result_dict[json_num] = merge(m2,m3,imple_interface3,imple_interface31,imple_class3,method_DictList)
                      json_num+=1
               except:
                      continue
