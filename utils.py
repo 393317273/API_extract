@@ -116,6 +116,7 @@ def detectFullParams(HTMLstring,methon):
         paramContainer_Mid = soup.pre.contents
         paramContainer = [str(x) for x in paramContainer_Mid]
         fullContent =''.join([x for x in ' '.join(paramContainer).replace('\xa0',' ') if x.isprintable()])#去除一系列不可见字符并保留空格
+        #isprintable()如果字符串的所有字符都是可打印的，则isprintable()方法在其他所有情况下返回true，则返回true
         #print(fullContent)
         methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
         #按换行符split并在for中分别做成soup
@@ -128,7 +129,7 @@ def detectFullParams(HTMLstring,methon):
                 methodType = str(methodSoup.a.next)
                 methodName = str(methodSoup.a.next.next)
                 methodName = ''.join([x for x in methodName if x.isalpha()])
-                
+             #isalpha()方法:判断字符串是否只由字母组成,如果字符串中所有字符都是字母则返回True,否则返回False   
                 
             else:
                 #这一行没a 内置数据类型
@@ -150,5 +151,41 @@ def detectFullParams(HTMLstring,methon):
         return params
 
 
+def detectFullParams2(HTMLstring,methon):
+    params = {}
+    #soup = bs(HTMLstring,'html.parser',from_encoding='utf-8')
+    try:        
+        paramContainer = re.findall(r'<span class="parameters">(.*?)</span>',HTMLstring)
+        if(paramContainer):
+            fullContent =''.join([x for x in ' '.join(paramContainer).replace('&nbsp;',' ') if x.isprintable()])#去除一系列不可见字符并保留空格
+            #print(fullContent)
+            methodContent = fullContent.split('\\n')
+            #print(methodContent)
+            if methodContent[0] == '()':
+                return params
+            for methodSentence in methodContent:
+                methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
+                #print(methodSentence)
+                if not isinstance(methodSoup.a,type(None)):
+                    #这一行有a，就是有超链接指向的非自定义类型
+                    methodType = str(methodSoup.a.next)
+                    methodName = str(methodSoup.a.next.next)
+                    methodName = ''.join([x for x in methodName if x.isalpha()])
+                #isalpha()方法:判断字符串是否只由字母组成,如果字符串中所有字符都是字母则返回True,否则返回False   
+                    
+                else:
+                    #这一行没a 内置数据类型
+                    (methodType,methodName) = [x for x in methodSentence.split(' ') if x!='']
+                    methodType = ''.join([x for x in methodType if x.isalpha()])
+                    methodName = ''.join([x for x in methodName if x.isalpha()])
+                params[methodName] = methodType
+        return params
+    except AttributeError:
+        return params
 
-
+#type1:(<a href="../../../../../java.base/java/lang/String.html" title="class in java.lang">String</a>&nbsp;title,
+#      \n <a href="../../../../../java.base/java/lang/String.html" title="class in java.lang">String</a>&nbsp;media)
+#type2:(int&nbsp;tabIndex)
+#type3:(<a href="../../../../../java.base/java/lang/String.html" title="class in java.lang">String</a>&nbsp;target)
+#type4:(short&nbsp;stringType,\n <a href="../../../../../java.base/java/lang/String.html" title="class in java.lang">String</a>&nbsp;stringValue)
+   
