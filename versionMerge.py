@@ -39,7 +39,7 @@ def main():
     writeJson(JDK_merged,merged_path)
 def testRecursive():
     #TODO:递归中因为写法问题，只存在于新版本的API版本号回直接变成整个versionB的，修复
-    Version_List = [8,9,11]
+    Version_List = [8,9,11,17,18]
     result = Merge_Recursive(Version_List[0],Version_List[1:])
     writeJson(result,"fullMergeTest.json")
 if __name__ == "__main__":

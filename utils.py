@@ -121,7 +121,7 @@ def detectFullParams(HTMLstring,methon):
         methodContent = re.findall(rf'{methon[0]}(\(.*?\))',fullContent)[0].split('\\n')
         #按换行符split并在for中分别做成soup
         if methodContent[0] == '()':
-            return params
+            return params 
         for methodSentence in methodContent:
             methodSoup = bs(methodSentence,'html.parser',from_encoding='utf-8')
             if not isinstance(methodSoup.a,type(None)):
