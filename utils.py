@@ -48,12 +48,14 @@ def extractFullInterface(jsonDict):
 输入两个method字典，整合并输出一个带有version键值对的字典
 '''
 #DONE: 修复格式问题以匹配字典数组
-#TODO: 可能存在的问题：同名method可能无法判断出哪个亚种是先出现的,这会是个问题。最好加上参数个数匹配，
-#TODO: 在递归过程中，因为会把existed_version这个键也放了进去，导致会出现重复现象
+#TODO: 可能存在的问题：同名method可能无法判断出哪个亚种是先出现的,这会是个问题。最好加上参数个数匹配?
+#DONE: 在递归过程中，因为会把existed_version这个键也放了进去，导致会出现重复现象
 def compareMethod(methodDictA,methodDictB,versionA,versionB):
     mergedMethod = {}
+    if not isinstance(versionB,int):
+        print("catch")
     A_method = [str(x) for x in methodDictA] #将整个字典转成字符串试试
-    B_method = [str(x) for x in methodDictB]
+    B_method = [str(x)  if isinstance(versionB,int) else str({list(x.keys())[0]:{key:val for key,val in x[list(x.keys())[0]].items() if key!="Exist_Version"}}) for x in methodDictB]
     mergedMethodList = list()
     for method in list(set(A_method)-set(B_method)):
         mergedMethodList.append(eval(method))
@@ -69,7 +71,7 @@ def compareMethod(methodDictA,methodDictB,versionA,versionB):
         if isinstance(versionB,int):
             mergedMethodList[-1][list(eval(method).keys())[0]]["Exist_Version"] = [versionA,versionB]
         else:
-            mergedMethodList[-1][method]["Exist_Version"] = [versionA]+versionB
+            mergedMethodList[-1][list(eval(method).keys())[0]]["Exist_Version"] = [versionA]+versionB
     return mergedMethodList
 '''
 输入两个JDK字典，用桶排序遍历键名，查询只在18出现的，两者皆有的，只在19出现的，然后返回
