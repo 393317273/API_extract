@@ -7,8 +7,9 @@ merged_path = "interface_merged.json"
 from utils import *
 import sys
 #DONE：根据全称对比
-#TODO：为了将所有一起对比，进行递归化
+#DONE：为了将所有一起对比，进行递归化
 #每一层独立读取版本，只输入版本号，不然太麻烦
+#TODO:根据修改后的jdk文档格式修改提取方法
 def Merge_Recursive(versionA,versionB_merge):
     if len(versionB_merge) == 1:
         versionB = versionB_merge[0]
@@ -39,7 +40,7 @@ def main():
     writeJson(JDK_merged,merged_path)
 def testRecursive():
     #TODO:递归中因为写法问题，只存在于新版本的API版本号回直接变成整个versionB的，修复
-    Version_List = [8,9,11,17,18]
+    Version_List = [8,9,11,17]
     result = Merge_Recursive(Version_List[0],Version_List[1:])
     writeJson(result,"fullMergeTest.json")
 if __name__ == "__main__":
