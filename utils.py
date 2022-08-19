@@ -47,7 +47,7 @@ def extractFullInterface(jsonDict):
 '''
 输入两个method字典，整合并输出一个带有version键值对的字典
 '''
-#TODO: 修复格式问题
+#TODO: 修复格式问题以匹配字典数组
 def compareMethod(methodDictA,methodDictB,versionA,versionB):
     mergedMethod = {}
     A_method = methodDictA.keys()
